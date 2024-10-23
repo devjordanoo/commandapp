@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Account {
+  id                 Int  @id @default(autoincrement())
+  userId             Int  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? 
+  access_token       String? 
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? 
+  session_state      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+ 
+model Session {
+  id           String   @id @default(cuid())
+  userId       Int @map("user_id")
+  companyId    Int @map("company_id")
+  expires      DateTime
+  sessionToken String   @unique @map("session_token")
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  active       Boolean  @default(true)
+
+  @@map("sessions")
+}
+ 
+model User {
+  id            Int    @id @default(autoincrement())
+  name          String
+  email         String?   @unique
+  password      String
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  companyId     Int
+  role          Int @default(1)
+  company       Company  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+
+  @@map("users")
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+ 
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Company {
+  id            Int  @id @default(autoincrement())
+  name          String
+  image         String?
+  User          User[]
+  Product       Product[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+
+  @@map("company")
+}
+
+model Product {
+  id            Int  @id @default(autoincrement())
+  name          String
+  image         String?
+  price         Float @default(00.00)
+  description   String @default("")
+  companyId     Int
+  company       Company  @relation(fields: [companyId], references: [id])
+  categories    CategoriesOnProducts[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+
+  @@map("product")
+}
+
+model Category {
+  id    Int                 @id @default(autoincrement())
+  name  String
+  products CategoriesOnProducts[]
+}
+
+model CategoriesOnProducts {
+  productId     Int
+  product       Product @relation(fields: [productId], references: [id])
+
+  categoryId     Int
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  active        Boolean @default(true)
+
+  @@id([productId, categoryId])
+}
