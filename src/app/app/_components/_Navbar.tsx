@@ -14,6 +14,7 @@ import {
 import { signOut, useSession } from "next-auth/react"
 import { getUserRoleName, Roles } from "@/utils/roles"
 import { Separator } from "@/components/ui/separator";
+import { ConfgiMenu } from "./_ConfigMenu"
 
 const NavBar = () => {
     const { data } = useSession()
@@ -51,15 +52,17 @@ const NavBar = () => {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label="Alternar Tema"
-                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                        >
-                            <Bolt className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                            <span className="sr-only">Configurações</span>
-                        </Button>
+                        <ConfgiMenu>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label="Alternar Tema"
+                                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            >
+                                <Bolt className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                                <span className="sr-only">Configurações</span>
+                            </Button>
+                        </ConfgiMenu>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
